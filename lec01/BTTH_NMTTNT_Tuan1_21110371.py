@@ -48,7 +48,7 @@ class UnweightedGraph(Graph):
     def __search(self, start: int, goal: int) -> list[int]:
         frontier = Queue() if self.search_type == 'BFS' else LifoQueue()
         frontier.put(start)
-        came_from: dict[int, int] = {start: start}
+        came_from: dict[int, int] = {start: -1}
 
         while not frontier.empty():
             current = frontier.get()
@@ -90,7 +90,7 @@ class WeightedGraph(Graph):
     def __search(self, start: int, goal: int) -> tuple[list[int], int]:
         frontier = PriorityQueue()
         frontier.put((0, start))
-        came_from: dict[int, int] = {start: start}
+        came_from: dict[int, int] = {start: -1}
         cost_so_far: dict[int, int] = {start: 0}
 
         while not frontier.empty():
