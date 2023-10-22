@@ -48,7 +48,7 @@ class UnweightedGraph(Graph):
     def __search(self, start: int, goal: int) -> list[int]:
         frontier = Queue() if self.search_type == 'BFS' else LifoQueue()
         frontier.put(start)
-        came_from: dict[int, int] = {start: start}
+        came_from: dict[int, int] = {start: -1}
 
         print(f'L = {start}')
         while not frontier.empty():
@@ -62,8 +62,10 @@ class UnweightedGraph(Graph):
                     frontier.put(_next)
                     came_from[_next] = current
 
-            print(
-                f'Node = {current}, L = {list(frontier.queue)}, father{[k for k, v in came_from.items() if v == current]} = {current}')
+            father = [k for k, v in came_from.items() if v == current]
+            print(f'Node = {current}', end='')
+            print(f', L = {list(frontier.queue)}', end='')
+            print(f', father{father} = {current}' if len(father) else '')
 
         if goal not in came_from:
             return []
@@ -94,9 +96,10 @@ class WeightedGraph(Graph):
     def __search(self, start: int, goal: int) -> tuple[list[int], int]:
         frontier = PriorityQueue()
         frontier.put((0, start))
-        came_from: dict[int, int] = {start: start}
+        came_from: dict[int, int] = {start: -1}
         cost_so_far: dict[int, int] = {start: 0}
 
+        print(f'PQ = ({start}, 0)')
         while not frontier.empty():
             _, current = frontier.get()
 
@@ -109,6 +112,9 @@ class WeightedGraph(Graph):
                     cost_so_far[_next] = new_cost
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
+
+            print('PQ = ', end='')
+            print(', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
 
         if goal not in came_from:
             return [], 0
