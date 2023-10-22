@@ -50,6 +50,7 @@ class UnweightedGraph(Graph):
         frontier.put(start)
         came_from: dict[int, int] = {start: start}
 
+        print(f'L = {start}')
         while not frontier.empty():
             current = frontier.get()
 
@@ -60,6 +61,9 @@ class UnweightedGraph(Graph):
                 if _next not in came_from:
                     frontier.put(_next)
                     came_from[_next] = current
+
+            print(
+                f'Node = {current}, L = {list(frontier.queue)}, father{[k for k, v in came_from.items() if v == current]} = {current}')
 
         if goal not in came_from:
             return []
