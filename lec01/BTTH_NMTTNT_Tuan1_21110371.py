@@ -68,6 +68,7 @@ class UnweightedGraph(Graph):
         while goal != start:
             path.append(goal)
             goal = came_from[goal]
+        path.append(start)
         path.reverse()
 
         return path
@@ -78,13 +79,13 @@ class WeightedGraph(Graph):
         super().__init__()
 
     def search(self, start: int, goal: int) -> tuple[list[int], int | None]:
-        pass
+        return self.__search(start, goal)
 
     def _neighbors(self, node: int) -> list[int]:
         return list(map(lambda x: x[0], self.data[node]))
 
     def __cost(self, from_node: int, to_node: int) -> int:
-        return list(filter(lambda x: to_node in x, self.data[from_node]))[0]
+        return list(filter(lambda x: to_node in x, self.data[from_node]))[0][1]
 
     def __search(self, start: int, goal: int) -> tuple[list[int], int]:
         frontier = PriorityQueue()
@@ -109,9 +110,11 @@ class WeightedGraph(Graph):
             return [], 0
 
         path = []
-        while goal != start:
-            path.append(goal)
-            goal = came_from[goal]
+        current = goal
+        while current != start:
+            path.append(current)
+            current = came_from[current]
+        path.append(start)
         path.reverse()
 
         return path, cost_so_far[goal]
@@ -127,14 +130,30 @@ def load_data(filename: str, graph_type: GraphType) -> tuple[dict, int, int]:
             if int(value) != 0 and graph_type is GraphType.UNWEIGHTED:
                 graph[i].append(j)
             elif int(value) != 0 and graph_type is GraphType.WEIGHTED:
-                graph[i].append((j, value))
+                graph[i].append((j, int(value)))
     f.close()
 
     return graph, start, goal
 
 
 if __name__ == '__main__':
-    g, s, f = load_data('Input.txt', GraphType.UNWEIGHTED)
-    gph = UnweightedGraph("BFS")
-    gph.data = g
-    print(gph.search(s, f))
+    gph: Graph = UnweightedGraph('BFS')
+    gph.data, s, e = load_data('Input.txt', GraphType.UNWEIGHTED)
+    result_path, _ = gph.search(s, e)
+    print('Result for BFS algorithm:', end=' ')
+    print('->'.join(str(node) for node in result_path))
+    print()
+
+    gph: Graph = UnweightedGraph('DFS')
+    gph.data, s, e = load_data('Input.txt', GraphType.UNWEIGHTED)
+    result_path, _ = gph.search(s, e)
+    print('Result for DFS algorithm:', end=' ')
+    print('->'.join(str(node) for node in result_path))
+    print()
+
+    gph: Graph = WeightedGraph()
+    gph.data, s, e = load_data('InputUSC.txt', GraphType.WEIGHTED)
+    result_path, result_cost = gph.search(s, e)
+    print('Result for USC algorithm:', end=' ')
+    print('->'.join(str(node) for node in result_path))
+    print('Cost is:', result_cost)
