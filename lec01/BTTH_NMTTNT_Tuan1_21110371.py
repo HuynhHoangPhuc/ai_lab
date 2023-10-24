@@ -54,6 +54,7 @@ class UnweightedGraph(Graph):
         frontier.put(start)
         came_from: dict[Node, Node] = {start: -1}
 
+        print(f'L = {start}')
         while not frontier.empty():
             current = frontier.get()
 
@@ -64,6 +65,11 @@ class UnweightedGraph(Graph):
                 if _next not in came_from:
                     frontier.put(_next)
                     came_from[_next] = current
+
+            father = [k for k, v in came_from.items() if v == current]
+            print(f'Node = {current}', end='')
+            print(f', L = {list(frontier.queue)}', end='')
+            print(f', father{father}' if len(father) else '')
 
         if goal not in came_from:
             return []
@@ -97,6 +103,7 @@ class WeightedGraph(Graph):
         came_from: dict[Node, Node] = {start: -1}
         cost_so_far: dict[Node, float] = {start: 0}
 
+        print(f'PQ = ({start},0)')
         while not frontier.empty():
             _, current = frontier.get()
 
@@ -110,6 +117,8 @@ class WeightedGraph(Graph):
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
 
+            print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
+
         if goal not in came_from:
             return [], 0
 
@@ -122,6 +131,49 @@ class WeightedGraph(Graph):
         path.reverse()
 
         return path, cost_so_far[goal]
+
+
+def UCS(graph, start, end):
+    visited = []
+    frontier = PriorityQueue()
+
+    frontier.put((0, start))
+    visited.append(start)
+
+    parent = dict()
+    parent[start] = None
+
+    path_found = False
+
+    print(f'PQ = ({start},0)')
+    while True:
+        if frontier.empty():
+            raise Exception("No way Exception")
+
+        current_w, current_node = frontier.get()
+        visited.append(current_node)
+
+        if current_node == end:
+            path_found = True
+            break
+
+        for nodei in graph[current_node]:
+            node, weight = nodei
+            if node not in visited:
+                frontier.put((current_w + weight, node))
+                parent[node] = current_node
+                visited.append(node)
+        print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
+
+    path = []
+    if path_found:
+        path.append(end)
+        while parent[end] is not None:
+            path.append(parent[end])
+            end = parent[end]
+        path.reverse()
+
+    return current_w, path
 
 
 def load_data(filename: str, graph_type: GraphType) -> tuple[dict, int, int]:
@@ -161,3 +213,14 @@ if __name__ == '__main__':
     print('Result for USC algorithm:', end=' ')
     print('->'.join(str(node) for node in result_path))
     print('Cost is:', result_cost)
+
+    gph: Graph = WeightedGraph()
+    file = open('test01.txt', 'r')
+    for line in file:
+        s, e, c = line.split()
+        gph.data[s].append((e, int(c)))
+    result_path, result_cost = gph.search('START', 'r')
+    print('Result for USC algorithm:', end=' ')
+    print('->'.join(str(node) for node in result_path))
+    print('Cost is:', result_cost)
+    print(UCS(gph.data, 'START', 'r'))
