@@ -1,0 +1,17 @@
+START d 3
+START e 9
+START p 1
+d b 1
+d c 8
+d e 2
+b a 2
+c a 2
+p q 15
+e h 1
+e r 9
+h p 4
+h q 4
+q r 3
+c f 5
+r f 5
+f GOAL 5
