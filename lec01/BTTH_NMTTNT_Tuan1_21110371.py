@@ -1,7 +1,11 @@
 from queue import LifoQueue, Queue, PriorityQueue
 from collections import defaultdict
 from enum import Enum
+from typing import Hashable
 import abc
+
+Node = Hashable
+Neighbor = list[Hashable | tuple[Hashable, float]]
 
 
 class GraphType(Enum):
@@ -11,22 +15,22 @@ class GraphType(Enum):
 
 class Graph(abc.ABC):
     def __init__(self):
-        self.data: dict[int, list] = defaultdict(list)
+        self.data: dict[Node, Neighbor] = defaultdict(list)
 
     @property
-    def data(self) -> dict:
+    def data(self) -> dict[Node, Neighbor]:
         return self.__graph
 
     @data.setter
-    def data(self, graph: dict[int, list]) -> None:
+    def data(self, graph: dict[Node, Neighbor]) -> None:
         self.__graph = graph
 
     @abc.abstractmethod
-    def _neighbors(self, node: int) -> list[int]:
+    def _neighbors(self, node: Node) -> Neighbor:
         pass
 
     @abc.abstractmethod
-    def search(self, start: int, goal: int) -> tuple[list[int], int | None]:
+    def search(self, start: Node, goal: Node) -> tuple[list[Node], float | None]:
         pass
 
 
@@ -39,18 +43,17 @@ class UnweightedGraph(Graph):
 
         self.search_type = search_type
 
-    def _neighbors(self, node: int) -> list[int]:
+    def _neighbors(self, node: Node) -> Neighbor:
         return self.data[node]
 
-    def search(self, start: int, goal: int) -> tuple[list[int], int | None]:
+    def search(self, start: Node, goal: Node) -> tuple[list[Node], float | None]:
         return self.__search(start, goal), None
 
-    def __search(self, start: int, goal: int) -> list[int]:
+    def __search(self, start: Node, goal: Node) -> list[Node]:
         frontier = Queue() if self.search_type == 'BFS' else LifoQueue()
         frontier.put(start)
-        came_from: dict[int, int] = {start: -1}
+        came_from: dict[Node, Node] = {start: -1}
 
-        print(f'L = {start}')
         while not frontier.empty():
             current = frontier.get()
 
@@ -61,11 +64,6 @@ class UnweightedGraph(Graph):
                 if _next not in came_from:
                     frontier.put(_next)
                     came_from[_next] = current
-
-            father = [k for k, v in came_from.items() if v == current]
-            print(f'Node = {current}', end='')
-            print(f', L = {list(frontier.queue)}', end='')
-            print(f', father{father} = {current}' if len(father) else '')
 
         if goal not in came_from:
             return []
@@ -84,22 +82,21 @@ class WeightedGraph(Graph):
     def __init__(self):
         super().__init__()
 
-    def search(self, start: int, goal: int) -> tuple[list[int], int | None]:
+    def search(self, start: Node, goal: Node) -> tuple[list[Node], float | None]:
         return self.__search(start, goal)
 
-    def _neighbors(self, node: int) -> list[int]:
+    def _neighbors(self, node: Node) -> Neighbor:
         return list(map(lambda x: x[0], self.data[node]))
 
-    def __cost(self, from_node: int, to_node: int) -> int:
+    def __cost(self, from_node: Node, to_node: Node) -> float:
         return list(filter(lambda x: to_node in x, self.data[from_node]))[0][1]
 
-    def __search(self, start: int, goal: int) -> tuple[list[int], int]:
+    def __search(self, start: Node, goal: Node) -> tuple[list[Node], float]:
         frontier = PriorityQueue()
         frontier.put((0, start))
-        came_from: dict[int, int] = {start: -1}
-        cost_so_far: dict[int, int] = {start: 0}
+        came_from: dict[Node, Node] = {start: -1}
+        cost_so_far: dict[Node, float] = {start: 0}
 
-        print(f'PQ = ({start}, 0)')
         while not frontier.empty():
             _, current = frontier.get()
 
@@ -112,9 +109,6 @@ class WeightedGraph(Graph):
                     cost_so_far[_next] = new_cost
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
-
-            print('PQ = ', end='')
-            print(', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
 
         if goal not in came_from:
             return [], 0
