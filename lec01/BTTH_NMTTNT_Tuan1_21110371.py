@@ -208,7 +208,7 @@ if __name__ == '__main__':
     print()
 
     gph: Graph = WeightedGraph()
-    gph.data, s, e = load_data('InputUSC.txt', GraphType.WEIGHTED)
+    gph.data, s, e = load_data('InputUCS.txt', GraphType.WEIGHTED)
     result_path, result_cost = gph.search(s, e)
     print('Result for USC algorithm:', end=' ')
     print('->'.join(str(node) for node in result_path))
