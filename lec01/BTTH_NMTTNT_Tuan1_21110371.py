@@ -69,7 +69,7 @@ class UnweightedGraph(Graph):
             father = [int(k) + 1 for k, v in came_from.items() if v == current]
             print(f'Node = v{current + 1}', end='')
             print(f', L = [{", ".join([f"v{node + 1}" for node in list(frontier.queue)])}]', end='')
-            print(f', father[{", ".join([f"v{node + 1}" for node in father])}] = v{current + 1}' if len(father) else '')
+            print(f', father[{", ".join([f"v{node}" for node in father])}] = v{current + 1}' if len(father) else '')
 
         if goal not in came_from:
             return []
@@ -103,7 +103,7 @@ class WeightedGraph(Graph):
         came_from: dict[Node, Node] = {start: -1}
         cost_so_far: dict[Node, float] = {start: 0}
 
-        print(f'PQ = (v{int(start) + 1},0)')
+        print(f'PQ = ({start if type(start) == str else f"v{int(start) + 1}"},0)')
         while not frontier.empty():
             _, current = frontier.get()
 
@@ -117,7 +117,7 @@ class WeightedGraph(Graph):
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
 
-            print(f'PQ =', ', '.join(f'(v{int(node) + 1},{cost})' for cost, node in sorted(frontier.queue)))
+            print(f'PQ =', ', '.join(f'({node if type(node) == str else f"v{int(node) + 1}"},{cost})' for cost, node in sorted(frontier.queue)))
 
         if goal not in came_from:
             return [], 0
@@ -145,7 +145,7 @@ def UCS(graph, start, end):
 
     path_found = False
 
-    print(f'PQ = ({start},0)')
+    print(f'PQ = ({start if type(start) == str else f"v{int(start) + 1}"},0)')
     while True:
         if frontier.empty():
             raise Exception("No way Exception")
@@ -163,7 +163,7 @@ def UCS(graph, start, end):
                 frontier.put((current_w + weight, node))
                 parent[node] = current_node
                 visited.append(node)
-        print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in sorted(frontier.queue)))
+        print(f'PQ =', ', '.join(f'({node if type(node) == str else f"v{int(node) + 1}"},{cost})' for cost, node in sorted(frontier.queue)))
 
     path = []
     if path_found:
@@ -214,13 +214,13 @@ if __name__ == '__main__':
     print('->'.join(str(f'v{int(node) + 1}') for node in result_path))
     print('Cost is:', result_cost)
 
-    # gph: Graph = WeightedGraph()
-    # file = open('test01.txt', 'r')
-    # for line in file:
-    #     s, e, c = line.split()
-    #     gph.data[s].append((e, int(c)))
-    # result_path, result_cost = gph.search('START', 'GOAL')
-    # print('Result for UCS algorithm:', end=' ')
-    # print('->'.join(str(node) for node in result_path))
-    # print('Cost is:', result_cost)
-    # print(UCS(gph.data, 'START', 'GOAL'))
+    gph: Graph = WeightedGraph()
+    file = open('test01.txt', 'r')
+    for line in file:
+        s, e, c = line.split()
+        gph.data[s].append((e, int(c)))
+    result_path, result_cost = gph.search('START', 'GOAL')
+    print('Result for UCS algorithm:', end=' ')
+    print('->'.join(str(node) for node in result_path))
+    print('Cost is:', result_cost)
+    print(UCS(gph.data, 'START', 'GOAL'))
