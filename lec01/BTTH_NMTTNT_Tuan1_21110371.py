@@ -219,8 +219,8 @@ if __name__ == '__main__':
     for line in file:
         s, e, c = line.split()
         gph.data[s].append((e, int(c)))
-    result_path, result_cost = gph.search('START', 'GOAL')
+    result_path, result_cost = gph.search('START', 'r')
     print('Result for UCS algorithm:', end=' ')
     print('->'.join(str(node) for node in result_path))
     print('Cost is:', result_cost)
-    print(UCS(gph.data, 'START', 'GOAL'))
+    print(UCS(gph.data, 'START', 'r'))
