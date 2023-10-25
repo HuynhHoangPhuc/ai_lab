@@ -117,7 +117,7 @@ class WeightedGraph(Graph):
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
 
-            print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
+            print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in sorted(frontier.queue)))
 
         if goal not in came_from:
             return [], 0
@@ -163,7 +163,7 @@ def UCS(graph, start, end):
                 frontier.put((current_w + weight, node))
                 parent[node] = current_node
                 visited.append(node)
-        print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in list(frontier.queue)))
+        print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in sorted(frontier.queue)))
 
     path = []
     if path_found:
