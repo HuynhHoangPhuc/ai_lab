@@ -103,7 +103,7 @@ class WeightedGraph(Graph):
         came_from: dict[Node, Node] = {start: -1}
         cost_so_far: dict[Node, float] = {start: 0}
 
-        print(f'PQ = ({start},0)')
+        print(f'PQ = (v{int(start) + 1},0)')
         while not frontier.empty():
             _, current = frontier.get()
 
@@ -117,7 +117,7 @@ class WeightedGraph(Graph):
                     frontier.put((new_cost, _next))
                     came_from[_next] = current
 
-            print(f'PQ =', ', '.join(f'({node},{cost})' for cost, node in sorted(frontier.queue)))
+            print(f'PQ =', ', '.join(f'(v{int(node) + 1},{cost})' for cost, node in sorted(frontier.queue)))
 
         if goal not in came_from:
             return [], 0
@@ -214,13 +214,13 @@ if __name__ == '__main__':
     print('->'.join(str(f'v{int(node) + 1}') for node in result_path))
     print('Cost is:', result_cost)
 
-    gph: Graph = WeightedGraph()
-    file = open('test01.txt', 'r')
-    for line in file:
-        s, e, c = line.split()
-        gph.data[s].append((e, int(c)))
-    result_path, result_cost = gph.search('START', 'GOAL')
-    print('Result for UCS algorithm:', end=' ')
-    print('->'.join(str(node) for node in result_path))
-    print('Cost is:', result_cost)
-    print(UCS(gph.data, 'START', 'GOAL'))
+    # gph: Graph = WeightedGraph()
+    # file = open('test01.txt', 'r')
+    # for line in file:
+    #     s, e, c = line.split()
+    #     gph.data[s].append((e, int(c)))
+    # result_path, result_cost = gph.search('START', 'GOAL')
+    # print('Result for UCS algorithm:', end=' ')
+    # print('->'.join(str(node) for node in result_path))
+    # print('Cost is:', result_cost)
+    # print(UCS(gph.data, 'START', 'GOAL'))
