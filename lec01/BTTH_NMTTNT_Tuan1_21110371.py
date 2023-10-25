@@ -54,7 +54,7 @@ class UnweightedGraph(Graph):
         frontier.put(start)
         came_from: dict[Node, Node] = {start: -1}
 
-        print(f'L = {start}')
+        print(f'L = v{int(start) + 1}')
         while not frontier.empty():
             current = frontier.get()
 
@@ -66,10 +66,10 @@ class UnweightedGraph(Graph):
                     frontier.put(_next)
                     came_from[_next] = current
 
-            father = [k for k, v in came_from.items() if v == current]
-            print(f'Node = {current}', end='')
-            print(f', L = {list(frontier.queue)}', end='')
-            print(f', father{father}' if len(father) else '')
+            father = [int(k) + 1 for k, v in came_from.items() if v == current]
+            print(f'Node = v{current + 1}', end='')
+            print(f', L = [{", ".join([f"v{node + 1}" for node in list(frontier.queue)])}]', end='')
+            print(f', father[{", ".join([f"v{node + 1}" for node in father])}] = v{current + 1}' if len(father) else '')
 
         if goal not in came_from:
             return []
@@ -197,21 +197,21 @@ if __name__ == '__main__':
     gph.data, s, e = load_data('Input.txt', GraphType.UNWEIGHTED)
     result_path, _ = gph.search(s, e)
     print('Result for BFS algorithm:', end=' ')
-    print('->'.join(str(node) for node in result_path))
+    print('->'.join(str(f'v{int(node) + 1}') for node in result_path))
     print()
 
     gph: Graph = UnweightedGraph('DFS')
     gph.data, s, e = load_data('Input.txt', GraphType.UNWEIGHTED)
     result_path, _ = gph.search(s, e)
     print('Result for DFS algorithm:', end=' ')
-    print('->'.join(str(node) for node in result_path))
+    print('->'.join(str(f'v{int(node) + 1}') for node in result_path))
     print()
 
     gph: Graph = WeightedGraph()
     gph.data, s, e = load_data('InputUCS.txt', GraphType.WEIGHTED)
     result_path, result_cost = gph.search(s, e)
     print('Result for UCS algorithm:', end=' ')
-    print('->'.join(str(node) for node in result_path))
+    print('->'.join(str(f'v{int(node) + 1}') for node in result_path))
     print('Cost is:', result_cost)
 
     gph: Graph = WeightedGraph()
@@ -220,7 +220,7 @@ if __name__ == '__main__':
         s, e, c = line.split()
         gph.data[s].append((e, int(c)))
     result_path, result_cost = gph.search('START', 'GOAL')
-    print('Result for USC algorithm:', end=' ')
+    print('Result for UCS algorithm:', end=' ')
     print('->'.join(str(node) for node in result_path))
     print('Cost is:', result_cost)
     print(UCS(gph.data, 'START', 'GOAL'))
